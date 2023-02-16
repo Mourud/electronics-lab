@@ -1,0 +1,10 @@
+.jxbrowser*
+.meta*
+.vscode*
+dvt/*
+RemoteSystemsTempFiles/
+part*/.*
+part*/Debug/
+part*/targetConfigs/
+part*/*.cmd
+.DS_Store
