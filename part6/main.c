@@ -13,5 +13,4 @@ void main(void)
   TA0CTL = TASSEL_2 + MC_1 + TAIE + ID_0;
   // Timer A control set to SMCLK, 1MHz
   // and count up mode MC_1
-  _bis_SR_register(LPM0_bits + GIE); // Enter Low power mode 0 and enable inrerrupts
 }
