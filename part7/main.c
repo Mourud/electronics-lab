@@ -15,7 +15,7 @@ int main(void)
 
   P1DIR |= BIT2;                            // Output on Pin 1.2
   P1SEL |= BIT2;                            // Pin 1.2 selected as PWM
-  TA0CCR0 = 50;  
+  TA0CCR0 = 50;                             // PWN period = 50/1MHz = 50us
   
                             // microseconds
   TA0CCTL1 = OUTMOD_7;      // TA0CCR1 reset/set-high voltage
