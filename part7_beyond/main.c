@@ -16,8 +16,7 @@ int main(void)
     // Timer A control set to SMCLK, 1MHz
     // and count up mode MC_1
 
-    // Make a list of 100 notes in Hz
-	// make a list of 200 random numbers
+	// Notes of Baba Black Sheep
     int notes[] = {261, 261, 392, 392, 440, 440, 392, 349, 349, 330, 330, 294, 294, 261, 392, 392, 349, 349, 330, 330, 294, 392, 392, 349, 349, 330, 330, 294};
 
     while (1)
