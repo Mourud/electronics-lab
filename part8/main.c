@@ -129,7 +129,7 @@ void InitializeButton(void)                 // Configure Push Button
 {
   P1DIR &= ~BUTTON;
   P1OUT |= BUTTON;
-  P1REN |= BUTTON;`
+  P1REN |= BUTTON;
   P1IES |= BUTTON;
   P1IFG &= ~BUTTON;
   P1IE |= BUTTON;
