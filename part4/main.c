@@ -15,6 +15,7 @@ void main(void)
 	P4OUT = 0b10000000;		  // set Pin P4.7  to high
 	P1REN = 0b00000010;		  // enable pull up/down resistor on P1.1
 	P1IE = 0b00000010;		  // Enable input at P1.1 as an interrupt
+	P1IES = 0b00000010;       // Set interrupt on falling edge (button press)
 	// Part 4
 	P1OUT &= ~0b00000001; // set Pin P1.0 to low
 	P4OUT &= ~0b10000000; // set Pin P4.7  to low
