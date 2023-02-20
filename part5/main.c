@@ -15,7 +15,6 @@ int main(void)
   P1DIR |= 0x01;                            // set pin P1.0 as output
   P4DIR |= 0x80;                            // set pin P4.7 as output
   P1DIR |= 0x04;                            // set pin P1.2 as output
-//   P3DIR |= 0x01;                            // set pin P3.0 as output
 
 
   while (1)
@@ -29,19 +28,16 @@ int main(void)
     if(ADC12MEM0>=2978){                    //If V > 2.4V
       P1OUT |= BIT0;                        //Turn on LED red
       P1OUT &= ~BIT2;                       //Turn off LED yellow
-      P3OUT &= ~BIT0;                       //Turn off LED yellow
       P4OUT &= ~BIT7;                       //Turn off LED green
     }
     else if(ADC12MEM0>=620){                //If V > 0.5V and V < 2.4V
       P1OUT &= ~BIT0;                       //Turn off LED red
-      P3OUT |= BIT0;                        //Turn on LED yellow
-      // P1OUT |= BIT2;                     //Turn on LED yellow
+      P1OUT |= BIT2;                     //Turn on LED yellow
       P4OUT &= ~BIT7;                       //Turn off LED green
     }
     else{                                   //If V < 0.5V
       P1OUT &= ~BIT0;                       //Turn off LED red
-      // P1OUT &= ~BIT2;                    //Turn off LED yellow
-      P3OUT &= ~BIT0;                       //Turn off LED yellow
+      P1OUT &= ~BIT2;                    //Turn off LED yellow
       P4OUT |= BIT7;                        //Turn on LED green
       
     }
