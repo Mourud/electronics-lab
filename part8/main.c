@@ -1,150 +1,72 @@
-//*1. Device starts up in LPM3 + blinking LED to indicate device is alive
- //    + Upon first button press, device transitions to application mode
- // 2. Application Mode
- //    + Continuously sample ADC Temp Sensor channel
- //
- //    + Transmit temperature value via TimerA UART to PC
+#include <msp430f5529.h>
 
-
-#include  "msp430.h"
-
-#define     LED1                  BIT0                         //for P1.0
-#define     LED2                  BIT7                         //for P4.7
-
-#define     BUTTON                BIT1
-
-#define     TXD                   BIT4                      // TXD on P4.4
-#define     RXD                   BIT5                      // RXD on P4.5
-
-#define     PreAppMode            0
-#define     RunningMode           1
-
-
-#define CALADC12_15V_30C  *((unsigned int *)0x1A1A)   // Temperature Sensor Calibration-30 C
-                                                      //See device datasheet for TLV table memory mapping
-#define CALADC12_15V_85C  *((unsigned int *)0x1A1C)   // Temperature Sensor Calibration-85 C
-
+#define TRIG BIT1
+#define ECHO BIT2
 
 unsigned int TXByte;
-volatile unsigned int Mode;
+unsigned int time;
+// Set P8.1(Trig) to output direction and P8.2(Echo) to input direction
+// Set P8.1 to low
 
-void InitializeButton(void);
-void PreApplicationMode(void);
+// Timer A control set to SMCLK, stop count MC_0 and clear counter, no division – //keep 1.048MHz,
+
+// checking for the event to finish possibly with a while loop time = TA0R; //read the counter
+
+long calcDistance(unsigned int time);
+
 
 void main(void)
 {
-  long tempMeasured;
-
-  WDTCTL = WDTPW + WDTHOLD;                 // Stop WDT
-
-  /* next  line to use internal calibrated 1.048MHz clock: */
-
-  TA0CTL = TASSEL_2 + MC_1 + TAIE +ID_3;            // Timer A control set to SMCLK, 1MHz and count up mode MC_1
+  WDTCTL = WDTPW + WDTHOLD; // Stop WDT
 
 
 
-  InitializeButton();
+  P8DIR = TRIG;
+  P8REN = ECHO;
+  P8OUT = 0;            // Set Trig pin to be low
+  UCA1CTL1 = UCSWRST;   // Reset the UART module
+  P4DIR = BIT4;
+  P4SEL |= BIT4 + BIT5; // Configure P4.4 and P4.5 for UART operation
+  UCA1CTL1 |= UCSSEL_2; // Select SMCLK as the clock source for the UART
+  UCA1BR0 = 109;        // Set the baud rate to 9600 (based on 1.048 MHz clock)
+  UCA1BR1 = 0;
+  UCA1MCTL = UCBRS_2;   // Set the modulation UCBRSx to 2
+  UCA1CTL1 &= ~UCSWRST; // Enable the UART module
+  TA0CTL = TASSEL_2 + MC_0 + ID_0; // SMCLK, continuous mode, no division, clear counter
 
-
-  P1DIR |= LED1;
-  P4DIR |= LED2;
-  P1OUT &= ~LED1;     //LEDs off
-  P4OUT &= ~LED2;
-  P4DIR |= TXD;
-  P4OUT |= TXD;
-
-
-  Mode = PreAppMode;
-  __enable_interrupt();      // Enable interrupts.
-  PreApplicationMode();          // Blinks LEDs, waits for button press
-
-  /* Configure ADC Temp Sensor Channel */
-
-  REFCTL0 &= ~REFMSTR;  // Reset REFMSTR to hand over control to ADC12_A ref control registers
-
-  ADC12CTL0 |= ADC12SHT03 + ADC12ON + ADC12REFON;  // Sampling time 32 cycles, ADC12 on and reference voltage for Temperature sensor is on
-  ADC12CTL1 |= ADC12SHP;                     // sampling timer
-  ADC12MCTL0 = ADC12SREF_1 + ADC12INCH_10;  // Select internal Vref and A10 = temp sense i/p
-  ADC12CTL0 |= ADC12ENC ;                     // enable conversion
-
-   __delay_cycles(1000);                     // Wait for ADC Ref to settle
-
-
-  /* Configure hardware UART */
-  UCA1CTL1 = UCSWRST; //Recommended to place USCI in reset first
-  P4SEL |= BIT4 + BIT5;
-  UCA1CTL1 |= UCSSEL_2; // Use SMCLK
-  UCA1BR0 = 109; // Set baud rate to 9600 with 1.048MHz clock (Data Sheet 36.3.13)
-  UCA1BR1 = 0; // Set baud rate to 9600 with 1.048MHz clock
-  UCA1MCTL = UCBRS_2; // Modulation UCBRSx = 2
-  UCA1CTL1 &= ~UCSWRST; // Initialize USCI state machine
-  /* if we were going to receive, we would also:
-     IE2 |= UCA1RXIE; // Enable USCI_A1 RX interrupt
-  */
-
-  /* Main Application Loop */
-  while(1)
+  while (1)
   {
-    ADC12CTL0 |= ADC12SC;        // Sampling and conversion start
+    P8OUT |= TRIG;
+    __delay_cycles(20);
+    P8OUT &= ~TRIG;
 
+   while ((P8IN & ECHO) == 0);
 
-    while (! (UCA1IFG & UCTXIFG)); // wait for TX buffer to be ready for new data
-    tempMeasured = ADC12MEM0;
-    tempMeasured = ((tempMeasured - CALADC12_15V_30C) * (85 - 30)) / (CALADC12_15V_85C - CALADC12_15V_30C) + 30.0;
+    TA0CTL |= MC_2; // Start timer
+    TA0R = 0;       // Clear timer
 
+ 
 
-    TXByte = tempMeasured;
-    UCA1TXBUF = TXByte;//Transmit TXByte;
+    /* next  line to use internal calibrated 1.048MHz clock: */
 
+    while ((P8IN & ECHO) == 4);
+    // read the counter and find the time in us
 
+    time = TA0R * 1/ 1.048;
 
-    P1OUT ^= LED1;  // toggle the light every time we make a measurement.
-    P4OUT &= ~LED2;// make sure that green LED is off
+    while (!(UCA1IFG & UCTXIFG));
+    long distance = calcDistance(time);
+    // send distance to the computer using UART
+    TXByte = distance;
+    UCA1TXBUF = TXByte; // Transmit TXByte;
 
-    // go to sleep, wait till timer expires to do another measurement.
-
-   _delay_cycles(500000);
-
+    __delay_cycles(100000);
   }
 }
 
-void PreApplicationMode(void)
+long calcDistance(unsigned int time)
 {
-  P1DIR |= LED1;
-  P4DIR |= LED2;
-  P1OUT |= LED1;                 // To enable the LED toggling effect
-  P4OUT &= ~LED2;
-
-  while (Mode == PreAppMode)  {
-    P1OUT ^= LED1;
-    P4OUT ^= LED2;                      // toggle the two lights.
-    _delay_cycles (500000);             //This function introduces 0.5 s delay
-
-                              }
-
-
+  // distance = time * speed of sound / 2
+  long distance = time * 0.034 / 2;
+  return distance;
 }
-
-void InitializeButton(void)                 // Configure Push Button
-{
-  P1DIR &= ~BUTTON;
-  P1OUT |= BUTTON;
-  P1REN |= BUTTON;
-  P1IES |= BUTTON;
-  P1IFG &= ~BUTTON;
-  P1IE |= BUTTON;
-}
-
-/* *************************************************************
- * Port Interrupt for Button Press
- * 1. During standby mode: to enter application mode
- *
- * *********************************************************** */
-
-void __attribute__ ((interrupt(PORT1_VECTOR))) PORT1_ISR(void) // Port 1 interrupt service routine
- {                                                    //code of the interrupt routine goes here
-    Mode = RunningMode;
-
-    P1IE &= ~BUTTON;         // Disable port 1 interrupts
-    P1IFG &= ~0b00000010;        // Clear P1.1 IFG.If you don't, it just happens again.
- }
