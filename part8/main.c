@@ -67,6 +67,7 @@ void main(void)
 long calcDistance(unsigned int time)
 {
   // distance = time * speed of sound / 2
+  // distance is in cm
   long distance = time * 0.034 / 2;
   return distance;
 }
