@@ -32,13 +32,13 @@ n_avg=1#rolling average between n_avg adjacent points (useful for noisy data wit
 
 # define the serial port. Pick one:
 # port = "/dev/ttyACM0"  #for Linux
-port = "COM5"  # For Windows "COM_"
+port = "/dev/tty.usbmodem1203"  # For Windows "COM_"
 # port = "/dev/tty.uart-XXXX" #For Mac?
 
 # give folder and file name for where to save processed data
 # MAKE SURE FILE IS NOT OPEN WHILE RUNNING
 # DATA WILL OVERWRITE ANYTHING IN THIS FILE
-csv_savename = "C:\\Users\\kotlicki\\Documents\\319\\2023\\AK programs\\heartdata.csv"
+csv_savename = "heartdata.csv"
 #######################################
 
 # attempt to automatically pop out plot - if fails, do so in console
