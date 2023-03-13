@@ -8,3 +8,6 @@ part*/Debug/
 part*/targetConfigs/
 part*/*.cmd
 .DS_Store
+*.csv
+*.xls
+
