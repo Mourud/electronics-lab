@@ -5,12 +5,6 @@
 
 unsigned int TXByte;
 unsigned int time;
-// Set P8.1(Trig) to output direction and P8.2(Echo) to input direction
-// Set P8.1 to low
-
-// Timer A control set to SMCLK, stop count MC_0 and clear counter, no division – //keep 1.048MHz,
-
-// checking for the event to finish possibly with a while loop time = TA0R; //read the counter
 
 long calcDistance(unsigned int time);
 
@@ -21,7 +15,7 @@ void main(void)
 
 
 
-  P8DIR = TRIG;
+  P8DIR = TRIG;         // Set P8.1(Trig) to output direction and P8.2(Echo) to input direction
   P8REN = ECHO;
   P8OUT = 0;            // Set Trig pin to be low
   UCA1CTL1 = UCSWRST;   // Reset the UART module
@@ -32,7 +26,8 @@ void main(void)
   UCA1BR1 = 0;
   UCA1MCTL = UCBRS_2;   // Set the modulation UCBRSx to 2
   UCA1CTL1 &= ~UCSWRST; // Enable the UART module
-  TA0CTL = TASSEL_2 + MC_0 + ID_0; // SMCLK, continuous mode, no division, clear counter
+  TA0CTL = TASSEL_2 + MC_0 + ID_0; // Timer A control set to SMCLK, stop count MC_0 and clear counter, no division – //keep 1.048MHz,
+
 
   while (1)
   {
