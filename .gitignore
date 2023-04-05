@@ -10,4 +10,15 @@ part*/*.cmd
 .DS_Store
 *.csv
 *.xls
+CeciliasMAZE*
 
+music/.ccsproject
+music/.cproject
+music/.project
+music/lnk_msp430f5529.cmd
+music/.launches/music.launch
+music/.settings/org.eclipse.cdt.codan.core.prefs
+music/.settings/org.eclipse.cdt.debug.core.prefs
+music/.settings/org.eclipse.core.resources.prefs
+music/targetConfigs/MSP430F5529.ccxml
+music/targetConfigs/readme.txt
