@@ -22,3 +22,14 @@ music/.settings/org.eclipse.cdt.debug.core.prefs
 music/.settings/org.eclipse.core.resources.prefs
 music/targetConfigs/MSP430F5529.ccxml
 music/targetConfigs/readme.txt
+project/.ccsproject
+project/.cproject
+project/.project
+project/lnk_msp430f5529.cmd
+project/update.c
+project/.settings/org.eclipse.cdt.codan.core.prefs
+project/.launches/project.launch
+project/.settings/org.eclipse.cdt.debug.core.prefs
+project/.settings/org.eclipse.core.resources.prefs
+project/targetConfigs/MSP430F5529.ccxml
+project/targetConfigs/readme.txt
