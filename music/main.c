@@ -110,6 +110,19 @@ void reset_msp430()
 }
 void play_music(int sel)
 {
+    if (sel == 3) // play game over music
+    {
+        int music[] = {NOTE_G4, NOTE_C4, NOTE_G4};
+        int i = 0;
+        for (i = 0; i < 3; i++)
+        {
+            int period = 1000000 / music[i];
+            TA0CCR0 = period;
+            TA0CCR1 = period / 2;
+            // delay for 0.5 seconds
+            __delay_cycles(1000000);
+        }
+    }
     if (sel == 2)
     {
         int music[] = {
