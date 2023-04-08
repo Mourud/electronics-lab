@@ -33,3 +33,6 @@ project/.settings/org.eclipse.cdt.debug.core.prefs
 project/.settings/org.eclipse.core.resources.prefs
 project/targetConfigs/MSP430F5529.ccxml
 project/targetConfigs/readme.txt
+music/Debug/main.d
+music/Debug/
+
